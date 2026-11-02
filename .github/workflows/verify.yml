@@ -2,6 +2,7 @@ name: Verify Tulsipur GP Portal
 on:
   push:
     branches:
+      - main
       - feature/gram-panchayat-report-viewer
   pull_request:
     branches:

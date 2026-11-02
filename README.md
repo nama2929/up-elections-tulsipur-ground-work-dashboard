@@ -18,12 +18,12 @@ To retain reports permanently, create a **separate PRIVATE GitHub repository** f
 
 ```toml
 dashboard_password = "YOUR_PRIVATE_OFFICE_PASSWORD"
-report_store_repo = "OWNER/PRIVATE_REPORTS_REPO"
-report_store_branch = "main"
+# The verified private report repository defaults to nama2929/tulsipur-gp-private-reports.
+# Only this additional secret is required:
 report_store_token = "YOUR_FINE_GRAINED_TOKEN_WITH_CONTENTS_READ_WRITE"
 ```
 
-The portal verifies that the configured report repository is private before reading or saving documents. DOCX files are stored in its `reports/` directory. Re-uploading the same GP updates the latest file while Git retains the version history. Without the optional storage credentials, the portal remains a functional session-only preview workspace.
+The app defaults to the private repository `nama2929/tulsipur-gp-private-reports` (override with `report_store_repo` if needed). It verifies that the report repository is private before reading or saving documents. DOCX files are stored in its `reports/` directory. Re-uploading the same GP updates the latest file while Git retains the version history. Without the optional storage credentials, the portal remains a functional session-only preview workspace.
 
 ## Run locally
 

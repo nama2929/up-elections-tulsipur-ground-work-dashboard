@@ -20,3 +20,5 @@ jobs:
         run: python -m py_compile app.py gp_ui.py report_engine.py report_store.py
       - name: Test DOCX extraction
         run: python test_report_engine.py
+      - name: Smoke test Streamlit app
+        run: python test_streamlit_app.py

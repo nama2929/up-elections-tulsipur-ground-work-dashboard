@@ -144,7 +144,7 @@ def run():
     if "gp_section" not in st.session_state:st.session_state.gp_section="Overview"
     if "gp_current" not in st.session_state:st.session_state.gp_current=""
     store=None;storage_error=""
-    repo=secrets("report_store_repo");token=secrets("report_store_token")
+    repo=secrets("report_store_repo") or "nama2929/tulsipur-gp-private-reports";token=secrets("report_store_token")
     branch=secrets("report_store_branch") or "main"
     persisted=[]
     if repo and token:

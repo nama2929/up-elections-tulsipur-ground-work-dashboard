@@ -63,7 +63,7 @@ class ReportStore:
     def save(self,report):
         self.ensure_private()
         if len(report["raw"])>8*1024*1024:raise ValueError("Document exceeds 8 MB")
-        name=re.sub(r"[^\\w-]+","_",report["name"],flags=re.UNICODE).strip("_")
+        name=re.sub(r"[^\w-]+","_",report["name"],flags=re.UNICODE).strip("_")
         if not name:raise ValueError("Missing Gram Panchayat name")
         path="reports/"+name+".docx"
         api_path="/contents/"+urllib.parse.quote(path,safe="/")

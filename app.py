@@ -188,6 +188,12 @@ def gate() -> None:
 
 gate()
 
+# V3: the branded splash and password gate above remain unchanged.
+# After authentication, use the dedicated Gram Panchayat research workspace.
+import gp_ui
+gp_ui.run()
+st.stop()
+
 if "page" not in st.session_state:
     st.session_state.page = "Home"
 if "active_report" not in st.session_state:

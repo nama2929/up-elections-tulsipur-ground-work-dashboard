@@ -5,7 +5,7 @@ from pathlib import Path
 import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
-from report_engine import LABELS, parse_report
+from report_engine import LABELS, parse_report, display_question, aligned_sections
 from report_store import ReportStore
 
 ROOT=Path(__file__).resolve().parent
@@ -102,18 +102,18 @@ def report_page(report):
         x,y=st.columns(2)
         with x:
             st.markdown("#### Historical totals")
-            st.caption("Q3 · Vote entries summed within this Gram Panchayat only; historical booth IDs are not mapped to current booths.")
+            st.caption(("Q2" if report.get("format")=="current" else "Q3")+" · Historical vote entries within this Gram Panchayat only; booth IDs are not automatically mapped.")
             chart(list(report["votes"].items()))
         with y:
             st.markdown("#### Field-recorded percentage estimates")
-            st.caption("Q11 · Report author's estimates; these are NOT representative polling or validated voter support.")
+            st.caption(("Q12" if report.get("format")=="current" else "Q11")+" · Report author's estimates, not representative polling or verified voter support.")
             chart(report["estimates"],"%")
         st.markdown("#### Source narrative · Q10")
         raw_blocks(report,10)
     with original:
         st.info("Every question retains the original Hindi response, including complete tables and long-form notes.")
-        for q,label in LABELS.items():
-            with st.expander(f"प्रश्न {q:02} — {label}",expanded=q==1):
+        for q in LABELS:
+            with st.expander(display_question(report,q),expanded=q==1):
                 raw_blocks(report,q)
         st.download_button("Download original Word report",report["raw"],
           file_name=report["filename"],mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
@@ -214,10 +214,14 @@ def run():
         if not reports:st.info("Upload reports to enable cross-Panchayat comparison.")
         else:
             q=st.selectbox("Compare original question across Gram Panchayats",list(LABELS),
-                           format_func=lambda x:f"Q{x:02} — {LABELS[x]}")
+                           format_func=lambda x:f"{x:02d} · {LABELS[x]}")
             for name,r in sorted(reports.items()):
                 with st.expander(name+" · "+r["block"],expanded=len(reports)==1):
-                    raw_blocks(r,q)
+                    if r.get("format")=="legacy":
+                        st.caption("Previous report format: question numbers differ from the new template. Original source headings are shown below.")
+                    for source_q in aligned_sections(r,q):
+                        st.markdown("**"+safe(display_question(r,source_q))+"**",unsafe_allow_html=True)
+                        raw_blocks(r,source_q)
             st.divider()
             counts=Counter(t for r in reports.values() for title,desc in r["issues"] for t in set(issue_topics(title,desc)))
             st.markdown("#### Recurring documented issue categories")

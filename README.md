@@ -1,55 +1,43 @@
-# Saarthi Analytics — Tulsipur Ground Operations Portal
+# Saarthi Analytics — Tulsipur Gram Panchayat Reports
 
-**Tulsipur Assembly 291** | Standalone, password-protected Streamlit portal.
+Streamlit app for **Tulsipur Assembly 291**. It retains the original Saarthi-logo loading animation and office password screen.
 
-Reuses the Manjhanpur ground-work dashboard's structure and Saarthi branding. In this first version, **no Google Sheets are connected**. No fake field figures are displayed.
+## Workflow (no Google Sheets)
 
-## What's inside
+- **Overview:** Gram Panchayat directory and consolidated counters.
+- **Gram Panchayat Reports:** Select one GP, see a visual summary, and expand the **complete original responses to questions 1–12**, including tables and long Hindi text. Download the source DOCX.
+- **Intelligence Lab:** Compare original responses to the same question across GPs and summarize documented issue categories. These are field reports, not representative surveys or vote predictions.
+- **Issues Register:** Issue-by-issue cross-GP review with categories.
+- **Add Reports:** Upload several DOCX files in the same 12-question format. Each new GP becomes one profile. Booth entries stay inside the original source question; there is no booth-wise dashboard.
 
-- Saarthi logo splash/loading screen on a new session, followed by office password sign-in
-- Manjhanpur-style navigation: **Home • Reports • Daily Summary • Team**
-- Six prepared reporting sections (Daily Field Reports, Worker Registration, WhatsApp Outreach, Issues & Action Taken, Booth Visits, Social Media Reporting)
-- Tulsipur-branded empty states where data will appear later
-- Secure credential handling via Streamlit Secrets, with sign-out
-- Responsive layout, suitable for desktop and phone
+## Report retention and confidentiality
 
-## Run locally (Windows / VS Code)
+**Uploaded DOCX files are in the browser's Streamlit session only** unless private storage is configured. A refresh/disconnect can clear them. The public dashboard repository contains **no actual report documents, personal contact details, or passwords**.
 
-1. Unzip this folder and open it in VS Code.
-2. Install the dependency:
-   ```powershell
-   python -m pip install -r requirements.txt
-   ```
-3. Create a file named `.streamlit/secrets.toml`, using `.streamlit/secrets.toml.example` as a template, and **replace the placeholder password** with your chosen password.
-4. Run:
-   ```powershell
-   python -m streamlit run app.py
-   ```
-5. Open the localhost address displayed in the terminal.
+To retain reports permanently, create a **separate PRIVATE GitHub repository** for Word files. Configure its fine-grained repository token in **Streamlit Cloud → App settings → Secrets** (never commit it to GitHub):
 
-Alternatively set the environment variable `TULSIPUR_DASHBOARD_PASSWORD` rather than using `secrets.toml`.
+```toml
+dashboard_password = "YOUR_PRIVATE_OFFICE_PASSWORD"
+report_store_repo = "OWNER/PRIVATE_REPORTS_REPO"
+report_store_branch = "main"
+report_store_token = "YOUR_FINE_GRAINED_TOKEN_WITH_CONTENTS_READ_WRITE"
+```
 
-## Deploy to Streamlit Community Cloud
+The portal verifies that the configured report repository is private before reading or saving documents. DOCX files are stored in its `reports/` directory. Re-uploading the same GP updates the latest file while Git retains the version history. Without the optional storage credentials, the portal remains a functional session-only preview workspace.
 
-1. Put all project files in a new GitHub repository. **Do not upload `.streamlit/secrets.toml`** (the `.gitignore` already excludes it).
-2. On [share.streamlit.io](https://share.streamlit.io), create a new app, choose that repository, set the entry point to `app.py`, and deploy.
-3. Under **App settings → Secrets**, paste:
-   ```toml
-   dashboard_password = "YOUR_CHOSEN_PASSWORD"
-   ```
-4. Reboot the app if prompted. Visitors will see the Saarthi splash followed by the password gate.
+## Run locally
 
-**Important:** Your original Manjhanpur login password has *not* been copied, and no Google service-account credentials or sheet IDs are included.
+```bash
+python -m pip install -r requirements.txt
+python -m streamlit run app.py
+```
 
-## When you're ready for Sheets
+Put your local password in `.streamlit/secrets.toml` or set `TULSIPUR_DASHBOARD_PASSWORD`. Do not commit real secrets. The application uses the code repository's `assets/saarthi-logo.png` for its splash and UI.
 
-Add the Tulsipur coordinator list and approved Google Sheet IDs to `config.py`, then implement a data loader for the matching reporting sections. This version intentionally makes no API calls to Google Sheets and contains no private report data.
+## Source verification
 
-## Project files
+The parser flags disagreements between a GP's reported voter total and listed booth totals, and differences between current and historical booth IDs. It does **not** automatically equate the IDs. Q11 values are displayed as *field-recorded estimates*, not verified election support.
 
-- `app.py` — visual portal, splash, password and navigation
-- `config.py` — prepared reporting sections and empty connection settings
-- `assets/saarthi-logo.png` — Saarthi logo reused from supplied branded presentation
-- `.streamlit/config.toml` — theme
-- `.streamlit/secrets.toml.example` — safe password configuration sample
-- `requirements.txt` — dependency
+## Deployment
+
+Streamlit Cloud should continue pointing to `app.py` in `nama2929/up-elections-tulsipur-ground-work-dashboard`. This feature branch can be reviewed in a pull request before merging into the deployed `main` branch.
